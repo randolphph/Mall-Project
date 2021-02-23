@@ -1,1 +1,2 @@
-这是一个自己写的商城项目
+简易商城项目
+技术栈：Vuex + Vant + Node.js + MongoDB 
