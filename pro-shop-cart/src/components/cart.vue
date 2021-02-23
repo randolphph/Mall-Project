@@ -31,6 +31,7 @@
 import axios from "axios";
 import API_LIST from '@/APILIST.config';
 import {Toast} from 'vant';
+import {mapGetters, mapActions} from 'vuex';
 
 export default {
   name: "cart",
@@ -45,18 +46,27 @@ export default {
   },
   components : {},
   created(){
-    if (localStorage.userName) {
-      this.$notify(localStorage.userName+'您已经登录了');
+    if (localStorage.userInfo) {
       this.islogin = false;
-      this.msg = '购物车 ' + localStorage.userName;
+      this.msg = '购物车 ';
       this.cartArr = localStorage.cartInfo ? JSON.parse(localStorage.cartInfo) : [];
       //计算商品总数
       this.countAllGoodsNum();
       this.countAllGoodsPrice();
+      //将cartArr 传入vuex
+      this.addToVuex(this.cartArr);
 
     }
+
   },
+   computed : {
+     //从cart.js中映射来的数据
+     ...mapGetters(['shopCartList'])
+
+    },
   methods: {
+      //映射事件
+      ...mapActions(['addToVuex']),
       //返回首页按钮
       onClickLeft(){
           localStorage.setItem('inxState', 0);

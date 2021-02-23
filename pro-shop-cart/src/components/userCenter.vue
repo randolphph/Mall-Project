@@ -3,9 +3,15 @@
     <van-nav-bar
         :title=msg
         left-text="返回"
+        right-text='退出登录'
         @click-left="backHomefn"
+        @click-right='logOut'
         left-arrow
     />
+    <div class="userImgDiv">
+        <h1>欢迎：{{userName}}</h1>
+        <p>{{userInfo.describe}}</p>
+    </div>
     <footerBar></footerBar>
   </div>
 
@@ -22,17 +28,21 @@ export default {
   name: "userCenter",
   data() {
     return {
-    msg: "购物车",
+    msg: "用户中心",
     cartArr : [],
+    userName : '',
+    //用户信息对象
+    userInfo : {}
     };
   },
   components : {footerBar},
   created(){
-    if (localStorage.userName) {
-      this.$notify(localStorage.userName+'您已经登录了');
+    if (localStorage.userInfo) {
+      this.userInfo = JSON.parse(localStorage.userInfo);
+      this.$notify(this.userInfo.username+'您已经登录了');
       this.islogin = false;
-      this.msg = '用户中心 ' + localStorage.userName;
       this.cartArr = localStorage.cartInfo ? JSON.parse(localStorage.cartInfo) : [];
+      this.userName = this.userInfo.username;
 
     }
   },
@@ -42,6 +52,15 @@ export default {
           this.$router.push({
               path : '/'
           })
+      },
+      logOut(){
+          localStorage.userInfo = '';
+          this.$dialog.alert({
+					message: '您已经退出登录！'
+				}).then(()=>{
+                    this.backHomefn();
+                })
+
       }
     
 
@@ -150,4 +169,15 @@ export default {
 		width: 100px;height: 100px;
 	}
 	.goodsDiv h2{font-size: 22px;}
+      .userImgDiv{
+      		float: left;overflow: hidden;
+      		position: relative;border-radius: 10px;margin:10px;
+      }
+      .userImgDiv img{
+      		position: absolute;top: 0;left: -20px;
+      		width: 260px;
+      }
+      .userInfoDiv{
+      		font-size: 14px;float: left;text-align: left;
+      }
 </style>

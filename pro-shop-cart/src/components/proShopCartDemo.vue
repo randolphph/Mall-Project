@@ -1,52 +1,49 @@
 <template>
   <div class="hello">
-    <h1>{{ msg }}</h1>
+    <!--搜索框-->
+    <van-search
+    v-model="searchValue"
+    show-action
+    label="商品"
+    placeholder="请输入搜索关键词"
+    @search="onSearch"
+    >
+      <template #action>
+          <div @click="onSearch">搜索</div>
+      </template>
+    </van-search>
 
-    <div v-if="islogin">
-        <van-button type="danger" @click="loginBtn">登录</van-button>
-        <van-button type="danger" @click="registerBtn">注册</van-button>
-    </div>
+    <!--轮播图-->
+    <van-swipe :autoplay="1000" class="sliderDiv">
+      <van-swipe-item v-for="(image, index) in sliderImages" :key="index">
+      <img v-lazy="image" />
+      </van-swipe-item>
+    </van-swipe>
 
-    <div v-if="!islogin">
-      <van-button type="danger" @click="cancelLoginBtn">退出登录</van-button>
-    </div>
-    
-    <div style='display:none'>
-      <div class="wrapDiv">
-        <input type="text" ref="inputRef"  class="leftDiv" placeholder="请输入" />
-      <div class="rightDiv">
-          {{get_Data}}
-      </div>
-      </div>
-      <van-button type="danger" @click="sendData">发送数据</van-button>
-      <van-button type="danger" @click="getData">获得数据</van-button>
-    </div>
+    <van-tabs  sticky v-for="(itemObj,index) in goodsObj " class="wrapDiv cle goodsList" :key="index">
+      <van-tab :key="index" :title=itemObj.name>
+          <li v-for="(item,index) in itemObj.goodsList_aa" @click="switchToGoodsProduct(item)" :key="index">
+            <label> <img :src=item.img /> </label>
+            {{item.name}} / ¥{{item.price}}
+          </li>
 
-    <div style="height:440px;overflow-y:scroll">
-      <div v-for="itemObj in goodsObj " class="wrapDiv cle goodsList">
-        <h1 class="goodsTitle">{{itemObj.name}}</h1>
-        <li v-for="item in itemObj.goodsList_aa" @click="switchToGoodsProduct(item)">
-          <label> <img :src=item.img /> </label>
-          {{item.name}} / ¥{{item.price}}
-        </li>
+          <li v-for="(item,index) in itemObj.goodsList_bb" :key="index" @click="switchToGoodsProduct(item)">
+            <label> <img :src=item.img /> </label>
+            {{item.name}} / ¥{{item.price}}
+          </li>
 
-        <li v-for="item in itemObj.goodsList_bb">
-          <label> <img :src=item.img /> </label>
-          {{item.name}} / ¥{{item.price}}
-        </li>
+          <li v-for="(item,index) in itemObj.goodsList_cc" :key="index" @click="switchToGoodsProduct(item)">
+            <label> <img :src=item.img /> </label>
+            {{item.name}} / ¥{{item.price}}
+          </li>
 
-        <li v-for="item in itemObj.goodsList_cc">
-          <label> <img :src=item.img /> </label>
-          {{item.name}} / ¥{{item.price}}
-        </li>
-
-        <li v-for="item in itemObj.goodsList_dd">
-          <label> <img :src=item.img /> </label>
-          {{item.name}} / ¥{{item.price}}
-        </li>
-
-      </div>
-    </div>
+          <li v-for="(item,index) in itemObj.goodsList_dd" :key="index" @click="switchToGoodsProduct(item)">
+            <label> <img :src=item.img /> </label>
+            {{item.name}} / ¥{{item.price}}
+          </li>
+      
+      </van-tab>
+    </van-tabs>
 
     <footerBar></footerBar>
   
@@ -65,24 +62,31 @@ export default {
   name: "proShopCartDemo",
   data() {
     return {
-    msg: "商城",
     send_Data: "你好",
     get_Data : '',
-    islogin : true,
     //所有商品对象分类以及数据
     goodsObj : [],
     //header标签组
     tabActive : 0,
+    //用户信息对象
+    userInfo : {},
+    searchValue : '',
+    //轮播图
+    sliderImages : []
     };
   },
   components : {entryGoods,footerBar},
   created(){
-    if (localStorage.userName) {
-      this.$notify(localStorage.userName+'您已经登录了');
+    axios.get(API_LIST.getImgUrls)
+          .then((_d)=>{
+            this.sliderImages = _d.data.urls;
+          })
+    if (localStorage.userInfo) {
+      this.userInfo = JSON.parse(localStorage.userInfo);
+      this.$notify(this.userInfo.username+'您已经登录了');
       this.islogin = false;
-      this.msg = '首页 ' + localStorage.userName;
-      this.getGoodsCategoryFn();
     }
+    this.getGoodsCategoryFn();
   },
   methods: {
     //去往商品详情页
@@ -95,11 +99,20 @@ export default {
       })
 
     },
-    //向中间件发送
-    sendData() {
-      axios.get(API_LIST.node_a, {
-        params: { _xx: this.$refs.inputRef.value },
-      });
+    //搜索框
+    onSearch(){
+      let _v = this.searchValue;
+      if (_v === '' || _v === undefined) {
+        this.$notify('查询结果不能为空');
+      } else {
+        this.$notify('查不到')
+        //axios.get(API_LIST.node_a,{
+        //   params : {_xx : _v}
+        // }).then(()=>{
+        //   this.$notify('查不到')
+        // })
+      }
+
     },
     //获得所有商品的品类以及商品信息
     getGoodsCategoryFn(){
@@ -111,34 +124,7 @@ export default {
            )
 
     },
-    
-    //接收中间件信息
-    getData() {
-      axios.get(API_LIST.node_b)
-            .then(
-              (_d) => {
-                console.log(_d);
-                this.get_Data = _d.data[0].name; 
-
-              }
-            )
-    },
-    //登录
-    loginBtn(){
-      this.$router.push({path : '/userLogin'})
-
-    },
-    //注册
-    registerBtn() {
-      this.$router.push({path:'/register'});
-    },
-    //退出登录
-    cancelLoginBtn() {
-      localStorage.userName = '';
-      this.$notify('您已经退出登录');
-      this.islogin = true;
-
-    }
+  
 
 
   }
@@ -231,4 +217,8 @@ export default {
            clear: both;margin:5px auto;font-size: 22px;border-radius: 5px;
            background: #5d5d5d;width: 50%;color: #fff;padding:3px 0;
       }
+      .sliderDiv{
+        width: 90%;margin:10px auto;
+        }
+      .sliderDiv img{width:100%;height:188px;}
 </style>

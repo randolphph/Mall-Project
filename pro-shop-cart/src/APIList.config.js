@@ -15,7 +15,13 @@ const API_LIST = {
     //获得所有商品大类
     getGoodsCategory : BASEURL + '/getGoodsCategory',
     //用id查询商品信息
-    getGoodsInfoById : BASEURL + '/getGoodsInfoById'
+    getGoodsInfoById : BASEURL + '/getGoodsInfoById',
+    //商品列表信息
+    getGoodsList : BASEURL + '/getGoodsList',
+    //分页时获得商品信息
+    pageChange : BASEURL + '/pageChange',
+    //轮播图
+    getImgUrls : BASEURL + '/getImgUrls',
 }
 
 module.exports = API_LIST

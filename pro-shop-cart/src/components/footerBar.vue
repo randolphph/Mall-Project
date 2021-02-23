@@ -4,7 +4,7 @@
             <van-tabbar-item icon="home-o">首页</van-tabbar-item>
             <van-tabbar-item icon="search">分类</van-tabbar-item>
             <van-tabbar-item icon="friends-o">购物车</van-tabbar-item>
-            <van-tabbar-item icon="setting-o">我的</van-tabbar-item>
+            <van-tabbar-item icon="setting-o">{{isLoginTxt}}</van-tabbar-item>
         </van-tabbar>
     </div>
 </template>
@@ -17,8 +17,17 @@ export default {
     data(){
         return {
             //footer标签组
-            tabbarActive : 0
+            tabbarActive : 0,
+            isLoginTxt : ''
         }
+    },
+    created(){
+        if (localStorage.userInfo) {
+            this.isLoginTxt = '我的'
+        }else {
+            this.isLoginTxt = '未登录'
+        }
+        
     },
     mounted(){
         this.tabbarActive = Number(localStorage.getItem('inxState'));
@@ -40,9 +49,17 @@ export default {
                     this.$router.push({path : '/cart'});
                     break;
                 case 3 :
-                    localStorage.setItem('inxState', 3);
-                    this.$router.push({path : '/userCenter'});
+                    this.isLoginFn();
                     break;
+            }
+        },
+        //判断登录情况
+        isLoginFn() {
+            if (localStorage.userInfo) {
+                localStorage.setItem('inxState', 3); 
+                this.$router.push({path : '/userCenter'})
+            }else {
+                this.$router.push({path : '/userLogin'}); 
             }
         }
     }

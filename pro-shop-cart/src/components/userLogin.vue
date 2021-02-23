@@ -25,6 +25,8 @@
 
 
     <van-button type="danger" @click="loginFn">登录</van-button>
+    <van-button type="danger" @click="registerBtn">注册</van-button>
+    <footerBar></footerBar>
   </div>
 
 
@@ -33,6 +35,7 @@
 <script>
 import axios from "axios";
 import API_LIST from '@/APILIST.config';
+import footerBar from './footerBar'
 
 export default {
     name : 'register',
@@ -45,6 +48,7 @@ export default {
             password : '',
         }
     },
+    components : {footerBar},
     methods : {
         backHomeFn(){
             this.$router.go(-1);
@@ -68,22 +72,38 @@ export default {
             }
             axios.post(API_LIST.login_post,_loginObj)
                 .then(_d => {
-                      this.$dialog.alert({
-                        message : '登录成功，欢迎'+_d.data.regInfo.username
-                    }).then(
-                        () => {
-                            if (_d.data.reg_code === 5) {
-                                localStorage.userName = _d.data.regInfo.username;
+                      if (_d.data.reg_code === 3) {
+                        this.$dialog.alert({
+                        message : '用户不存在'
+                        })
+                      }else if (_d.data.reg_code === 4) {
+                         this.$dialog.alert({
+                            message : '密码错误'
+                        }) 
+                      }else if (_d.data.reg_code === 5){
+
+                          this.$dialog.alert({
+                            message : '登录成功，欢迎'+_d.data.regInfo.username
+                        }).then(
+                            () => {
+                                if (_d.data.reg_code === 5) {
+                                    localStorage.userInfo = JSON.stringify( _d.data.regInfo);
+                                }
+    
+                                // 登录完成，返回首页
+                                localStorage.setItem('inxState', 0);
+                                this.$router.push({path : '/'})
+    
                             }
+                        )
 
-                            // 注册完成，返回首页
-                            this.$router.push({path : '/'})
-
-                        }
-                    )
+                      }
                 })
 
         },
+        registerBtn() {
+         this.$router.push({path:'/register'});
+        }
 
     }
 }

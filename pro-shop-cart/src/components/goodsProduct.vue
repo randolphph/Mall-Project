@@ -52,6 +52,7 @@ export default {
     show : false,
     goods : {},
     goodsId : 0,
+    userInfo : {},
     sku:{
 				  tree: [
 				    {
@@ -91,10 +92,10 @@ export default {
   },
   components : {},
   created(){
-    if (localStorage.userName) {
-      this.$notify(localStorage.userName+'您已经登录了');
+    if (localStorage.userInfo) {
+      this.userInfo = JSON.parse(localStorage.userInfo);
       this.islogin = false;
-      this.msg = '详情页 ' + localStorage.userName;
+      this.msg = '详情页 ';
 
       //获取首页传过来的商品id
       let goodsId = this.$route.query._goodsObjId;
